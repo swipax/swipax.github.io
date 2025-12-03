@@ -5,20 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Berke Bodur | Cyber Security</title>
     
-    <!-- Tailwind CSS (Doğrudan tarayıcıda çalışır) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React ve ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     
-    <!-- Babel (JSX kodunu tarayıcının anlaması için) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-    <!-- Konfigürasyon ve Stiller -->
     <script>
       tailwind.config = {
         theme: {
@@ -40,11 +35,16 @@
             animation: {
               'scanline': 'scanline 8s linear infinite',
               'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'fade-in': 'fadeIn 0.5s ease-in-out',
             },
             keyframes: {
               scanline: {
                 '0%': { transform: 'translateY(-100%)' },
                 '100%': { transform: 'translateY(100%)' }
+              },
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' }
               }
             }
           },
@@ -57,56 +57,53 @@
       ::-webkit-scrollbar-track { background: #0a0a0a; }
       ::-webkit-scrollbar-thumb { background: #1f1f1f; border-radius: 4px; }
       ::-webkit-scrollbar-thumb:hover { background: #008f11; }
-      .typing-cursor::after { content: '|'; animation: blink 1s step-start infinite; }
-      @keyframes blink { 50% { opacity: 0; } }
+      .selection-green::selection { background-color: #00ff41; color: black; }
+
+      /* HTML İçerik Stilleri */
+      .formatted-content h3 { font-size: 1.25rem; font-weight: 700; color: white; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+      .formatted-content p { margin-bottom: 1rem; line-height: 1.75; color: #d1d5db; }
+      .formatted-content ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 1rem; color: #9ca3af; }
+      .formatted-content ol { list-style-type: decimal; padding-left: 1.25rem; margin-bottom: 1rem; color: #9ca3af; }
+      .formatted-content li { margin-bottom: 0.5rem; }
+      .formatted-content strong { color: #f3f4f6; font-weight: 700; }
+      .formatted-content a { color: #00ff41; text-decoration: underline; }
+      .formatted-content blockquote { border-left: 4px solid #00ff41; padding-left: 1rem; font-style: italic; color: #9ca3af; margin: 1rem 0; }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
-  }
-}
-</script>
 </head>
-<body>
+<body class="selection-green">
     <div id="root"></div>
 
-    <!-- REACT UYGULAMASI -->
     <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
 
-      // --- ICON COMPONENTS (SVG) ---
-      // Harici kütüphane yerine ikonları buraya gömdüm ki hata vermesin.
+      // --- ICONS ---
       const Icons = {
-        Terminal: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>,
-        Code: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>,
-        User: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
-        Shield: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>,
-        Menu: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>,
-        X: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
-        Github: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>,
-        Mail: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>,
-        Linkedin: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>,
-        ExternalLink: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>,
-        ArrowRight: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>,
-        ArrowLeft: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>,
-        Folder: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>,
-        FileText: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>,
-        Calendar: () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
-        Tag: () => <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>,
-        Hash: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>,
-        Server: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>,
-        Globe: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        Terminal: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>,
+        Code: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>,
+        User: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
+        Shield: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>,
+        Menu: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>,
+        X: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+        Github: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>,
+        Mail: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>,
+        Linkedin: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>,
+        ExternalLink: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>,
+        ArrowRight: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>,
+        ArrowLeft: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>,
+        Folder: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>,
+        FileText: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>,
+        Calendar: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
+        Tag: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>,
+        Hash: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>,
+        Server: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>,
+        Globe: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>,
+        ImageIcon: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       };
 
-      // --- CONSTANTS ---
+      // --- DATA ---
       const USER_INFO = {
         name: "Berke Bodur",
-        bio: "Siber güvenlik dünyasına tutkuyla bağlı bir araştırmacı. Ağ güvenliği ve güvenli yazılım geliştirme üzerine çalışmalar yapıyorum.",
+        bio: "Siber güvenlik, Ağ güvenliği, güvenli yazılım geliştirme ve zararlı yazılım analizi üzerine çalışmalar yapıyorum.",
         terminalIntro: [
           "Sistem başlatılıyor...",
           "Kullanıcı: Berke Bodur",
@@ -117,40 +114,73 @@
       };
 
       const SOCIAL_LINKS = [
-        { name: "GitHub", url: "https://github.com/berkebodur", icon: "github", username: "@swipax" },
+        { name: "GitHub", url: "https://github.com/swipax", icon: "github", username: "@swipax" },
         { name: "LinkedIn", url: "https://www.linkedin.com/in/berke-bodur-752184255/", icon: "linkedin", username: "Berke Bodur" },
-        { name: "Email", url: "mailto:iletisim@berkebodur.com", icon: "mail", username: "berkebodur2@gmail.com" }
+        { name: "Email", url: "mailto:berkebodur2@gmail.com", icon: "mail", username: "berkebodur2@gmail.com" }
       ];
 
       const PROJECTS = [
         {
           id: "1",
-          title: "Ağ Trafiği Analiz Aracı",
-          description: "Python kullanarak geliştirilen, yerel ağdaki şüpheli paketleri tespit eden ve raporlayan temel düzeyde bir IDS prototipi.",
-          content: `### Proje Hakkında\nBu proje, yerel ağ trafiğini dinleyerek (sniffing) belirli imzaları taşıyan şüpheli paketleri tespit etmeyi amaçlar.\n\n### Özellikler\n- **TCP/UDP Analizi:** Gelen paketlerin protokol başlıklarını inceler.\n- **Port Tarama Tespiti:** SYN flood benzeri saldırıları algılar.\n- **Loglama:** 'threats.log' dosyasına kayıt tutar.`,
-          tags: ["Python", "Scapy", "Network Security"],
-          github: "https://github.com/berkebodur/network-analyzer",
-          date: "2023-10-15",
-          category: "project"
-        },
-        {
-          id: "2",
-          title: "OWASP Top 10 Nedir?",
-          description: "Web güvenliğinde en kritik 10 güvenlik açığını incelediğim detaylı blog yazısı.",
-          content: `### OWASP Top 10'e Giriş\nWeb uygulama güvenliği denildiğinde akla gelen ilk standart OWASP Top 10 listesidir.\n\n#### 1. Broken Access Control\nKullanıcıların yetkileri dışındaki alanlara erişebilmesidir.\n\n#### 2. Injection\nSQL Injection en bilinen örneğidir.`,
-          tags: ["Web Security", "OWASP", "Education"],
-          date: "2023-11-02",
-          category: "blog"
-        },
-        {
-          id: "3",
-          title: "Basit Keylogger Tespiti",
-          description: "Windows sistemlerde arka planda çalışan şüpheli hook işlemlerini tarayan C# aracı.",
-          content: `### Amaç\nBu araç, Windows API'lerini (SetWindowsHookEx) kullanarak klavye girdilerini dinleyen kötü amaçlı yazılımları tespit etmek için geliştirilmiştir.\n\n### Teknik Detaylar\nC# ve .NET Framework kullanılarak yazılmıştır.`,
-          tags: ["C#", "Malware Analysis"],
-          github: "https://github.com/berkebodur/hook-detector",
-          date: "2023-12-10",
-          category: "project"
+          title: "Küresel Ransomware Tehdit Raporu",
+          description: "OSINT kaynakları kullanılarak son 30 günde tespit edilen 265 siber saldırının, aktif fidye yazılımı gruplarının ve hedef ülkelerin teknik analizi.",
+          content: `
+            <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-700 pb-2">Rapor Özeti</h3>
+            <p class="mb-4">Bu rapor, 1 Aralık 2025 itibarıyla son 30 günü kapsayan ve açık kaynak istihbaratı (OSINT) platformlarından derlenen veriler ışığında hazırlanmıştır. Toplam <strong class="text-cyber-green">265 doğrulanmış olay</strong> analiz edilmiştir.</p>
+              <img src="https://iili.io/fxe5fcP.png" alt="Ransomware Saldırıları Grafiği" class="w-full h-auto rounded-lg my-6" />
+
+            <h3 class="text-xl font-bold text-white mt-8 mb-4">1. En Aktif Tehdit Aktörleri</h3>
+            <p class="mb-4">Yapılan analizler sonucunda, saldırı hacminin büyük kısmını belirli grupların domine ettiği görülmüştür. Listenin başında yer alan <span class="text-red-500 font-bold">Qilin</span> ve <span class="text-red-400 font-bold">Akira</span>, toplam saldırıların üçte birinden fazlasını gerçekleştirmektedir.</p>
+
+            <div class="bg-gray-900/50 p-5 rounded-lg border border-gray-800 my-6">
+              <p class="font-mono text-sm text-gray-500 mb-3 border-b border-gray-800 pb-2">// Saldırı İstatistikleri (Top 5)</p>
+              <ul class="space-y-3">
+                <li class="flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+                  <span class="text-red-500 font-bold min-w-[100px]">Qilin:</span> 
+                  <span class="text-white">54 Olay</span> 
+                  <span class="text-[10px] text-red-400 bg-red-900/20 border border-red-900/30 px-2 py-0.5 rounded ml-2 font-mono tracking-wider">En Çok Görülen</span>
+                </li>
+                <li class="flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                  <span class="text-red-400 font-bold min-w-[100px]">Akira:</span> 
+                  <span class="text-white">46 Olay</span>
+                </li>
+                <li class="flex items-center gap-3">
+                   <span class="w-2 h-2 rounded-full bg-orange-400"></span>
+                  <span class="text-orange-400 font-bold min-w-[100px]">Play:</span> 
+                  <span class="text-white">28 Olay</span>
+                </li>
+                <li class="flex items-center gap-3">
+                   <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                  <span class="text-yellow-400 font-bold min-w-[100px]">Ransomhouse:</span> 
+                  <span class="text-white">19 Olay</span>
+                </li>
+                <li class="flex items-center gap-3">
+                   <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                  <span class="text-gray-300 font-bold min-w-[100px]">Tridentlocker:</span> 
+                  <span class="text-white">16 Olay</span>
+                </li>
+              </ul>
+            </div>
+
+            <h3 class="text-xl font-bold text-white mt-8 mb-4">2. Coğrafi Dağılım ve Hedefler</h3>
+            <p class="mb-4">Saldırıların coğrafi dağılımı incelendiğinde, teknolojik altyapının yoğun olduğu ülkelerin birincil hedef olduğu görülmektedir.</p>
+            
+            <ul class="list-disc pl-5 mt-4 space-y-2 text-gray-300">
+              <li><strong class="text-blue-400">Amerika Birleşik Devletleri</strong></li>
+              <li><strong class="text-blue-400">Romanya</strong></li>
+              <li><strong class="text-blue-400">Kanada ve İngiltere</strong></li>
+            </ul>
+
+            <h3 class="text-xl font-bold text-white mt-8 mb-4">3. Teknik Değerlendirme</h3>
+            <p>Veriler, fidye yazılımı  <span class="italic text-cyber-green">(Ransomware) </span>gruplarının özellikle <span class="text-red-500 font-bold min-w-[100px]">Qilin</span> grubunun operasyonel kapasitesini ciddi oranda artırdığını göstermektedir.</p>
+          `,
+          tags: ["Threat Intelligence", "OSINT", "Data Visualization"],
+          image: "https://github.com/swipax/swipax.github.io/blob/main/ransomtopcountries.png?raw=true",
+          date: "2025-12-01",
+          category: "project",
+          github: null
         }
       ];
 
@@ -158,13 +188,13 @@
 
       // 1. TERMINAL COMPONENT
       const Terminal = ({ lines, onNavigate }) => {
-        const [history, setHistory] = React.useState([]);
-        const [input, setInput] = React.useState('');
-        const [showIntro, setShowIntro] = React.useState(true);
-        const inputRef = React.useRef(null);
-        const bottomRef = React.useRef(null);
+        const [history, setHistory] = useState([]);
+        const [input, setInput] = useState('');
+        const [showIntro, setShowIntro] = useState(true);
+        const inputRef = useRef(null);
+        const bottomRef = useRef(null);
 
-        React.useEffect(() => {
+        useEffect(() => {
           if (showIntro) {
             let delay = 0;
             lines.forEach((line, index) => {
@@ -177,7 +207,7 @@
           }
         }, [lines, showIntro]);
 
-        React.useEffect(() => {
+        useEffect(() => {
           bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, [history]);
 
@@ -228,7 +258,7 @@
         };
 
         return (
-          <div className="w-full max-w-2xl bg-cyber-black border border-cyber-gray rounded-lg shadow-2xl font-mono text-sm overflow-hidden" onClick={() => inputRef.current?.focus()}>
+          <div className="w-full max-w-2xl bg-cyber-black border border-cyber-gray rounded-lg shadow-2xl font-mono text-sm overflow-hidden transform hover:scale-[1.01] transition-transform duration-300" onClick={() => inputRef.current?.focus()}>
             <div className="bg-cyber-gray px-4 py-2 flex items-center gap-2 border-b border-gray-800">
               <div className="flex gap-2"><div className="w-3 h-3 rounded-full bg-red-500"></div><div className="w-3 h-3 rounded-full bg-yellow-500"></div><div className="w-3 h-3 rounded-full bg-green-500"></div></div>
               <div className="flex-1 text-center text-xs text-gray-400">root@berke-bodur:~</div>
@@ -270,33 +300,68 @@
       const ProjectCard = ({ project, onClick }) => (
         <div onClick={onClick} className="bg-cyber-black border border-gray-800 rounded-lg p-6 hover:border-cyber-green transition-all cursor-pointer group h-full flex flex-col relative overflow-hidden">
            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500 text-white">
-             {project.category === 'project' ? <Icons.Folder /> : <Icons.FileText />}
+             {project.category === 'project' ? <Icons.Folder width={40} height={40} /> : <Icons.FileText width={40} height={40} />}
            </div>
            <div className="flex items-center gap-2 mb-4">
              <span className={`text-xs px-2 py-1 rounded border font-mono ${project.category === 'project' ? 'border-blue-500/30 text-blue-400 bg-blue-500/5' : 'border-yellow-500/30 text-yellow-400 bg-yellow-500/5'}`}>{project.category === 'project' ? 'PROJE' : 'MAKALE'}</span>
-             <span className="text-xs text-gray-500 flex items-center gap-1 font-mono"><Icons.Calendar />{project.date}</span>
+             <span className="text-xs text-gray-500 flex items-center gap-1 font-mono"><Icons.Calendar width={12} height={12} />{project.date}</span>
            </div>
            <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyber-green transition-colors">{project.title}</h3>
            <p className="text-gray-400 text-sm mb-6 line-clamp-3 flex-1">{project.description}</p>
            <div className="flex flex-wrap gap-2 mt-auto">
-             {project.tags.map(t => <span key={t} className="text-xs text-gray-400 bg-gray-900 border border-gray-800 px-2 py-1 rounded flex items-center gap-1 font-mono"><Icons.Tag />{t}</span>)}
+             {project.tags.map(t => <span key={t} className="text-xs text-gray-400 bg-gray-900 border border-gray-800 px-2 py-1 rounded flex items-center gap-1 font-mono"><Icons.Tag width={10} height={10} />{t}</span>)}
            </div>
         </div>
       );
 
-      // 4. MAIN APP COMPONENT
+      // 4. MAIN APP COMPONENT - ROUTING LOGIC UPDATE
       const App = () => {
-        const [page, setPage] = React.useState('home');
-        const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-        const [selectedProject, setSelectedProject] = React.useState(null);
+        // State for routing derived from Hash
+        const [route, setRoute] = useState({ page: 'home', id: null });
+        const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-        const navClass = (p) => `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${page === p ? 'bg-cyber-gray text-cyber-green border border-cyber-green/30' : 'text-gray-300 hover:text-white'}`;
+        // HASH ROUTING LOGIC
+        useEffect(() => {
+          const handleHashChange = () => {
+            const hash = window.location.hash.replace('#/', '').replace('#', '');
+            const parts = hash.split('/');
+            
+            // Default to home if empty
+            if (parts[0] === '' || !parts[0]) {
+              setRoute({ page: 'home', id: null });
+            } else if (parts[0] === 'project' && parts[1]) {
+              setRoute({ page: 'project-detail', id: parts[1] });
+            } else {
+              setRoute({ page: parts[0], id: null });
+            }
+          };
+
+          // Listen for hash changes
+          window.addEventListener('hashchange', handleHashChange);
+          
+          // Call on mount to set initial state
+          handleHashChange();
+
+          return () => window.removeEventListener('hashchange', handleHashChange);
+        }, []);
+
+        // Navigation Helper
+        const navigate = (page, id = null) => {
+          if (page === 'home') window.location.hash = '/';
+          else if (page === 'project-detail' && id) window.location.hash = `/project/${id}`;
+          else window.location.hash = `/${page}`;
+        };
+
+        const navClass = (p) => `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${route.page === p ? 'bg-cyber-gray text-cyber-green border border-cyber-green/30' : 'text-gray-300 hover:text-white'}`;
+
+        // Get selected project based on ID
+        const selectedProject = route.id ? PROJECTS.find(p => p.id === route.id) : null;
 
         // -- PAGE RENDERERS --
         const renderHome = () => (
           <div className="flex flex-col justify-between min-h-[80vh]">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full mb-10 flex-1">
-              <div className="order-2 lg:order-1 space-y-8">
+              <div className="order-2 lg:order-1 space-y-8 animate-fade-in">
                 <div>
                   <h2 className="text-cyber-green font-mono text-sm mb-2 flex items-center gap-2"><span className="w-2 h-2 bg-cyber-green animate-pulse rounded-full"></span>ROOT_ACCESS_GRANTED</h2>
                   <h1 className="text-5xl sm:text-7xl font-bold text-white mb-4">{USER_INFO.name}</h1>
@@ -304,65 +369,87 @@
                 </div>
                 <p className="text-gray-300 text-lg leading-relaxed border-l-2 border-cyber-green/30 pl-4">{USER_INFO.bio}</p>
                 <div className="flex gap-4">
-                  <button onClick={() => setPage('projects')} className="bg-cyber-green text-black px-6 py-3 font-mono font-bold rounded flex items-center gap-2 hover:bg-green-400 transition-colors">Veri Arşivine Git <Icons.ArrowRight /></button>
-                  <button onClick={() => setPage('contact')} className="border border-cyber-green text-cyber-green px-6 py-3 font-mono font-bold rounded hover:bg-cyber-green/10 transition-colors">Bağlantı Kur</button>
+                  <button onClick={() => navigate('projects')} className="bg-cyber-green text-black px-6 py-3 font-mono font-bold rounded flex items-center gap-2 hover:bg-green-400 transition-colors">Blog <Icons.ArrowRight size={18} /></button>
+                  <button onClick={() => navigate('contact')} className="border border-cyber-green text-cyber-green px-6 py-3 font-mono font-bold rounded hover:bg-cyber-green/10 transition-colors">Bağlantı Kur</button>
                 </div>
               </div>
               <div className="order-1 lg:order-2 flex justify-center w-full">
-                <Terminal lines={USER_INFO.terminalIntro} onNavigate={setPage} />
+                <Terminal lines={USER_INFO.terminalIntro} onNavigate={(p) => navigate(p)} />
               </div>
             </div>
             {/* Tech Stack */}
-            <div className="border-t border-gray-800 pt-8 mt-12">
-               <div className="flex items-center gap-2 mb-6 text-gray-500 font-mono text-xs uppercase tracking-widest"><Icons.Terminal /> :: Teknik Envanter ::</div>
+            <div className="border-t border-gray-800 pt-8 mt-12 animate-fade-in" style={{animationDelay: '0.2s'}}>
+               <div className="flex items-center gap-2 mb-6 text-gray-500 font-mono text-xs uppercase tracking-widest"><Icons.Terminal width={14} height={14} /> :: Teknik Envanter ::</div>
                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                 <SkillGroup icon={<Icons.Shield />} title="Güvenlik" skills={['Penetrasyon Testi', 'Malware Analizi', 'OWASP']} />
-                 <SkillGroup icon={<Icons.Hash />} title="Diller" skills={['Python', 'Bash', 'C/C++']} />
-                 <SkillGroup icon={<Icons.Server />} title="Sistem" skills={['Linux', 'Docker', 'Git']} />
-                 <SkillGroup icon={<Icons.Globe />} title="Araçlar" skills={['Wireshark', 'Burp Suite', 'Nmap']} />
+                 <SkillGroup icon={<Icons.Shield width={20} height={20} />} title="Güvenlik" skills={['Penetrasyon Testi', 'Malware Analizi', 'OWASP']} />
+                 <SkillGroup icon={<Icons.Hash width={20} height={20} />} title="Diller/Scripting" skills={['Python', 'Bash', 'PowerShell/VBS']} />
+                 <SkillGroup icon={<Icons.Server width={20} height={20} />} title="Sistem" skills={['Linux', 'Docker', 'Git']} />
+                 <SkillGroup icon={<Icons.Globe width={20} height={20} />} title="Araçlar" skills={['Wireshark', 'Splunk', 'Nmap']} />
                </div>
             </div>
           </div>
         );
 
         const renderProjects = () => {
-          if (selectedProject) {
+          if (route.page === 'project-detail' && selectedProject) {
             return (
               <div className="max-w-4xl mx-auto pt-10 animate-fade-in">
-                <button onClick={() => setSelectedProject(null)} className="flex items-center gap-2 text-cyber-green hover:text-white mb-6 font-mono"><Icons.ArrowLeft /> Geri Dön</button>
-                <article className="bg-cyber-black border border-gray-800 rounded-lg p-8 shadow-2xl">
-                  <header className="mb-8 border-b border-gray-800 pb-8">
+                <button onClick={() => navigate('projects')} className="flex items-center gap-2 text-cyber-green hover:text-white mb-6 font-mono"><Icons.ArrowLeft size={16} /> Listeye Dön</button>
+                <article className="bg-cyber-black border border-gray-800 rounded-lg p-8 shadow-2xl relative overflow-hidden">
+                  
+                  {/* Background element */}
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -mr-12 -mt-12 pointer-events-none"></div>
+
+                  <header className="mb-8 border-b border-gray-800 pb-8 relative z-10">
                      <span className={`text-xs px-2 py-1 rounded border mb-4 inline-block ${selectedProject.category === 'project' ? 'border-blue-500/30 text-blue-400' : 'border-yellow-500/30 text-yellow-400'}`}>{selectedProject.category === 'project' ? 'PROJE' : 'MAKALE'}</span>
                      <h1 className="text-3xl font-bold text-white mb-4">{selectedProject.title}</h1>
                      <p className="text-gray-400">{selectedProject.description}</p>
                   </header>
-                  <div className="text-gray-300 space-y-4 font-mono whitespace-pre-line">
-                    {selectedProject.content}
-                  </div>
+                  
+                  {/* TEXT CONTENT */}
+                  <div 
+                    className="formatted-content text-gray-300 font-mono mb-8 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: selectedProject.content }}
+                  />
+
+                  {/* IMAGE SECTION */}
+                  {selectedProject.image && (
+                      <div className="mt-8 relative group rounded-lg overflow-hidden border border-cyber-gray/50 bg-black/40">
+                          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyber-green to-transparent opacity-50"></div>
+                          <img 
+                              src={selectedProject.image} 
+                              alt={selectedProject.title} 
+                              className="w-full h-auto object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+                          />
+                          <div className="absolute inset-0 bg-cyber-green/5 pointer-events-none opacity-30 bg-[length:100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)]"></div>
+                      </div>
+                  )}
+
                   {selectedProject.github && (
                     <div className="mt-8 pt-8 border-t border-gray-800">
-                      <a href={selectedProject.github} target="_blank" className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded w-max hover:bg-gray-700"><Icons.Github /> GitHub</a>
+                      <a href={selectedProject.github} target="_blank" className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded w-max hover:bg-gray-700 transition-colors"><Icons.Github size={20} /> GitHub Reposu</a>
                     </div>
                   )}
                 </article>
               </div>
             );
           }
+          // If project not found or list view
           return (
-            <div className="pt-10">
+            <div className="pt-10 animate-fade-in">
               <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold text-white mb-4 flex justify-center gap-3"><Icons.Terminal className="text-cyber-green" /> Veri Arşivi</h1>
-                <p className="text-gray-400">Projelerim ve Blog yazılarım.</p>
+                <h1 className="text-4xl font-bold text-white mb-4 flex justify-center items-center gap-3"><Icons.Terminal width={32} height={32} className="text-cyber-green" /> Veri Arşivi</h1>
+                <p className="text-gray-400">Projelerim, araştırmalarım ve teknik blog yazılarım.</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {PROJECTS.map(p => <div key={p.id} onClick={() => setSelectedProject(p)}><ProjectCard project={p} /></div>)}
+                {PROJECTS.map(p => <div key={p.id}><ProjectCard project={p} onClick={() => navigate('project-detail', p.id)} /></div>)}
               </div>
             </div>
           );
         };
 
         const renderContact = () => (
-          <div className="max-w-3xl mx-auto pt-20 flex flex-col justify-center min-h-[60vh]">
+          <div className="max-w-3xl mx-auto pt-20 flex flex-col justify-center min-h-[60vh] animate-fade-in">
              <div className="bg-cyber-black border border-gray-800 rounded-2xl p-8 relative overflow-hidden">
                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-cyber-green/5 rounded-full blur-3xl"></div>
                <div className="relative z-10">
@@ -371,12 +458,12 @@
                    {SOCIAL_LINKS.map(link => (
                      <a key={link.name} href={link.url} target="_blank" className="flex items-center justify-between p-4 bg-gray-900/50 border border-gray-800 rounded hover:border-cyber-green hover:bg-gray-900 transition-all group">
                        <div className="flex items-center gap-4 text-white">
-                         {link.icon === 'github' && <Icons.Github />}
-                         {link.icon === 'linkedin' && <Icons.Linkedin />}
-                         {link.icon === 'mail' && <Icons.Mail />}
+                         {link.icon === 'github' && <Icons.Github width={20} height={20} />}
+                         {link.icon === 'linkedin' && <Icons.Linkedin width={20} height={20} />}
+                         {link.icon === 'mail' && <Icons.Mail width={20} height={20} />}
                          <div><div className="font-medium">{link.name}</div><div className="text-gray-500 text-sm">{link.username}</div></div>
                        </div>
-                       <Icons.ExternalLink />
+                       <Icons.ExternalLink width={18} height={18} />
                      </a>
                    ))}
                  </div>
@@ -390,34 +477,38 @@
             {/* Navigation */}
             <nav className="fixed top-0 w-full z-50 bg-cyber-black/90 backdrop-blur border-b border-cyber-gray">
               <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                <div className="flex items-center gap-2 cursor-pointer" onClick={() => {setPage('home'); setSelectedProject(null);}}>
-                  <Icons.Shield />
-                  <span className="font-mono font-bold text-lg text-white">BERKE<span className="text-cyber-green">BODUR</span></span>
+                <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('home')}>
+                  <Icons.Shield width={24} height={24} />
+                  <span className="font-mono font-bold text-lg text-white group-hover:text-cyber-green transition-colors">BERKE<span className="text-cyber-green group-hover:text-white transition-colors">BODUR</span></span>
                 </div>
                 <div className="hidden md:flex space-x-4">
-                  <button onClick={() => {setPage('home'); setSelectedProject(null);}} className={navClass('home')}><Icons.Terminal /> Ana Sayfa</button>
-                  <button onClick={() => {setPage('projects'); setSelectedProject(null);}} className={navClass('projects')}><Icons.Code /> Projeler</button>
-                  <button onClick={() => {setPage('contact'); setSelectedProject(null);}} className={navClass('contact')}><Icons.User /> İletişim</button>
+                  <button onClick={() => navigate('home')} className={navClass('home')}><Icons.Terminal width={16} height={16} /> Ana Sayfa</button>
+                  <button onClick={() => navigate('projects')} className={navClass('projects')}><Icons.Code width={16} height={16} /> Projeler</button>
+                  <button onClick={() => navigate('contact')} className={navClass('contact')}><Icons.User width={16} height={16} /> İletişim</button>
                 </div>
-                <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>{mobileMenuOpen ? <Icons.X /> : <Icons.Menu />}</button>
+                <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>{mobileMenuOpen ? <Icons.X width={24} height={24} /> : <Icons.Menu width={24} height={24} />}</button>
               </div>
               {mobileMenuOpen && (
                 <div className="md:hidden bg-cyber-black border-b border-gray-800 p-4 space-y-2">
-                   <button onClick={() => {setPage('home'); setMobileMenuOpen(false);}} className="block w-full text-left text-white py-2">Ana Sayfa</button>
-                   <button onClick={() => {setPage('projects'); setMobileMenuOpen(false);}} className="block w-full text-left text-white py-2">Projeler</button>
-                   <button onClick={() => {setPage('contact'); setMobileMenuOpen(false);}} className="block w-full text-left text-white py-2">İletişim</button>
+                   <button onClick={() => {navigate('home'); setMobileMenuOpen(false);}} className="block w-full text-left text-white py-2 hover:bg-gray-800 px-2 rounded">Ana Sayfa</button>
+                   <button onClick={() => {navigate('projects'); setMobileMenuOpen(false);}} className="block w-full text-left text-white py-2 hover:bg-gray-800 px-2 rounded">Projeler</button>
+                   <button onClick={() => {navigate('contact'); setMobileMenuOpen(false);}} className="block w-full text-left text-white py-2 hover:bg-gray-800 px-2 rounded">İletişim</button>
                 </div>
               )}
             </nav>
 
             <main className="pt-20 px-4 max-w-7xl mx-auto pb-20">
-              {page === 'home' && renderHome()}
-              {page === 'projects' && renderProjects()}
-              {page === 'contact' && renderContact()}
-            </main>
+              {route.page === 'home' && renderHome()}
+              {(route.page === 'projects' || route.page === 'project-detail') && renderProjects()}
+              {route.page === 'contact' && renderContact()}
+            </main> 
 
-            <footer className="text-center text-gray-600 py-8 border-t border-gray-800 text-sm">
-              © {new Date().getFullYear()} Berke Bodur. System Status: <span className="text-cyber-green">ONLINE</span>
+            <footer className="text-center text-gray-600 py-8 border-t border-gray-800 text-sm font-mono">
+              <div className="flex justify-center items-center gap-2">
+                <span>© {new Date().getFullYear()} Berke Bodur.</span>
+                <span className="hidden sm:inline">|</span>
+                <span>System Status: <span className="text-cyber-green animate-pulse">ONLINE</span></span>
+              </div>
             </footer>
           </div>
         );
@@ -427,7 +518,4 @@
       root.render(<App />);
     </script>
 </body>
-
 </html>
-
-
