@@ -500,26 +500,33 @@
               });
 
               // Helper for sorting
-              const sortAndSlice = (obj) => Object.entries(obj)
+              const sortAndSlice = (obj, limit) => Object.entries(obj)
                 .sort(([,a], [,b]) => b - a)
-                .slice(0, 10)
+                .slice(0, limit)
                 .map(([key, count]) => ({ key, count }));
 
-              const topUsernames = sortAndSlice(usernameCounts);
-              const topPasswords = sortAndSlice(passwordCounts);
-              const topCommands = sortAndSlice(commandCounts);
+              // UPDATED LIMITS TO 15
+              const topUsernames = sortAndSlice(usernameCounts, 15);
+              const topPasswords = sortAndSlice(passwordCounts, 15);
+              const topCommands = sortAndSlice(commandCounts, 10);
               
               // Sort IPs (Values are objects now, slightly different sort logic)
               const topIps = Object.entries(ipCounts)
                 .sort(([,a], [,b]) => b.count - a.count)
                 .slice(0, 10)
-                .map(([key, data]) => ({
-                  ip: key,
-                  count: data.count,
-                  country: data.geo ? (data.geo.country_code || 'Unknown') : 'N/A',
-                  city: data.geo ? (data.geo.city || 'Unknown') : 'N/A',
-                  protocol: data.protocol
-                }));
+                .map(([key, data]) => {
+                  // MASK IP LOGIC: 1.2.3.4 -> 1.2.3.0/24
+                  const ipParts = key.split('.');
+                  const maskedIp = ipParts.length === 4 ? `${ipParts[0]}.${ipParts[1]}.${ipParts[2]}.0/24` : key;
+
+                  return {
+                    ip: maskedIp, // Use masked IP for display
+                    count: data.count,
+                    country: data.geo ? (data.geo.country_code || 'Unknown') : 'N/A',
+                    city: data.geo ? (data.geo.city || 'Unknown') : 'N/A',
+                    protocol: data.protocol
+                  };
+                });
 
               setStats({ topUsernames, topPasswords, topCommands, topIps });
               setLoading(false);
