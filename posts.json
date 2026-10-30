@@ -1,3 +1,4 @@
 [
   {"slug":"merhaba","title":"Merhaba: Bu blogda neler paylaşacağım","date":"2026-10-30","summary":"Siber güvenlik ve cloud haberlerini kısa notlarla ve kendi yorumumla paylaşacağım.","tags":["Blog"]}
+  {"slug":"cisa-bod-26-04","title":"CISA BOD 26-04: Yamalamak yetmiyor, ihlal kontrolü de gerekiyor","date":"2026-10-30","summary":"CISA'nın yeni yama direktifi risk tabanlı bir model getiriyor ve en yüksek riskte yamadan önce ihlal kontrolü istiyor.","tags":["Blue Team","KEV"]}
 ]
