@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+<link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css">
+<title>Blog — Berke Bodur</title></head><body>
+<header><div class="wrap"><nav><a class="logo" href="index.html">bb/</a><div class="links"><a class="keep" href="index.html">Ana sayfa</a><a href="blog.html">Blog</a><button id="theme" aria-label="Tema">◐</button></div></nav></div></header>
+<main class="wrap"><div class="hero" style="padding:72px 0 40px"><h1>Blog</h1><p class="lead">Siber güvenlik ve cloud haberleri, kısa notlar ve laboratuvar çalışmalarım.</p></div>
+<section><div class="grid" id="postlist"></div></section></main>
+<footer><div class="wrap">© 2026 Berke Bodur</div></footer>
+<script>const root=document.documentElement;let t=null;try{t=localStorage.getItem("theme")}catch(e){}
+root.style.colorScheme=t||"dark";
+document.getElementById("theme").onclick=()=>{const n=root.style.colorScheme==="dark"?"light":"dark";root.style.colorScheme=n;try{localStorage.setItem("theme",n)}catch(e){}};</script><script src="blog.js"></script></body></html>
