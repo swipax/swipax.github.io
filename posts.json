@@ -1,4 +1,5 @@
 [
   {"slug":"merhaba","title":"Merhaba: Bu blogda neler paylaşacağım","date":"2026-10-30","summary":"Siber güvenlik ve cloud haberlerini kısa notlarla ve kendi yorumumla paylaşacağım.","tags":["Blog"]},
-  {"slug":"cisa-bod-26-04","title":"CISA BOD 26-04: Yamalamak yetmiyor, ihlal kontrolü de gerekiyor","date":"2026-10-30","summary":"CISA'nın yeni yama direktifi risk tabanlı bir model getiriyor ve en yüksek riskte yamadan önce ihlal kontrolü istiyor.","tags":["Blue Team","KEV"]}
+  {"slug":"cisa-bod-26-04","title":"CISA BOD 26-04: Yamalamak yetmiyor, ihlal kontrolü de gerekiyor","date":"2026-10-30","summary":"CISA'nın yeni yama direktifi risk tabanlı bir model getiriyor ve en yüksek riskte yamadan önce ihlal kontrolü istiyor.","tags":["Blue Team","KEV"]},
+  {"slug":"cve-2026-119977","title":"CVE-2026-119977: WordPress'i güncellerken açılan RCE penceresi","date":"2026-11-07","summary":"WordPress Core 4.7–7.1.3'te güncelleme sırasında kimlik doğrulamasız kod çalıştırmaya izin veren yarış durumu KEV listesine girdi. Nasıl çalışıyor, ne yapmalı, yamadan sonra neye bakmalı.","tags":["WordPress","KEV","Blue Team"]}
 ]
